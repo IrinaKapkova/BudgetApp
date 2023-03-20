@@ -37,5 +37,4 @@ public class BudgetController {
       return budgetService.getBalance();
     }
 
-
 }
