@@ -65,8 +65,12 @@ public class FilesServicesimpl implements FilesService {
             throw new RuntimeException(e);
         }
     }
-//ниже расположенные методы внутренние, нужны для того чтоб указанные публичные методы работали нормально (декомпозиция методов)
-    private boolean cleanDataFile() {
+//ниже расположенные методы были сначала только внутренними,
+// нужными для того чтоб указанные публичные методы работали нормально (декомпозиция методов) ,
+// тк решили применить cleanDataFile для импорта файла через http, сделали public
+// и добавили анатацию @Override-> Pull method cleanDataFile() to  FilesService
+    @Override
+    public boolean cleanDataFile() {
 // данный метод удаляет файл только если он уже существует
         // Path.of это путь, в скобках пишем (выбираем) ранее прописанный путь,
         // IDEA окрасила красным созданный метод так как нет обработки возможных исключений,ошибок
@@ -96,9 +100,13 @@ public class FilesServicesimpl implements FilesService {
             return false;
         }
     }
+
     //  метод возвращает сам файл без данных , он несет путь и наименование, методанные короче
+    // без контента , тут слеш нужен, так как класс старый и тут все вручную пишут
     @Override
     public File getDataFile (){
         return new File(dataFilePath+"/" + dataFileName);
     }
+
+
 }

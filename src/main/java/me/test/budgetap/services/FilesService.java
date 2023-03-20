@@ -16,5 +16,10 @@ public interface FilesService {
     //добавили  служебное слово return перед Files.readString(Path.of(dataFilePath));
     String readFromFile();
 
+    //ниже расположенные методы были сначала только внутренними,
+    // нужными для того чтоб указанные публичные методы работали нормально (декомпозиция методов) ,
+    // тк решили применить cleanDataFile для импорта файла через http, сделали public и добавили анатацию
+    boolean cleanDataFile();
+
     File getDataFile();
 }
