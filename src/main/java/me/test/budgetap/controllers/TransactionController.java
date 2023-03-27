@@ -12,9 +12,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import me.test.budgetap.model.Category;
 import me.test.budgetap.model.Transaction;
 import me.test.budgetap.services.BudgetService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Month;
 
 @RestController
@@ -66,7 +70,7 @@ public class TransactionController {
 //  так как тут есть обработка ошибки то и postman при неверном id выйдет статус 400
     @GetMapping("/{id}")
 
-        public ResponseEntity<Transaction> getTransactionById(@PathVariable long id) {
+    public ResponseEntity<Transaction> getTransactionById(@PathVariable long id) {
         Transaction transaction = budgetService.getTransaction(id);
         if (transaction == null) {
             ResponseEntity.notFound();
@@ -133,7 +137,8 @@ public class TransactionController {
         }
         return ResponseEntity.notFound().build();
     }
-// Postman  Delete запрос с URL http://localhost:8080/transaction/0 например
+
+    // Postman  Delete запрос с URL http://localhost:8080/transaction/0 например
 // swagger  требует только корректный ID
 // в schemas можно увидеть названия полей сущностей
     @DeleteMapping
@@ -141,6 +146,7 @@ public class TransactionController {
         budgetService.deleteAllTransaction();
         return ResponseEntity.ok().build();
     }
+
     @GetMapping
     // для описания  метода используется анатацию   @Operation (Операция) библиотеки io.swagger.v3.oas.annotation
     // у неe очень много параметров , которые можно переопределить , например
@@ -155,7 +161,7 @@ public class TransactionController {
     // Для описания параметра можно использовать анатацию  @Parameters где value это смысл
     // например  name  имя  и example пример
     // при этом в swagger  можно видеть Parameters стал с примером и с наименованием
-    @Parameters( value = {
+    @Parameters(value = {
             @Parameter(name = "month", example = "Декабрь")
     })
     //  анатации @ApiResponses API-ответы содержит в себе другие анатации массив , например
@@ -178,5 +184,16 @@ public class TransactionController {
     public ResponseEntity<Transaction> getAllTransactions(@RequestParam(required = false) Month month,
                                                           @RequestParam(required = false) Category category) {
         return null;
+    }
+
+    @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Object> addTransactionsFromFile(@RequestParam MultipartFile file) {
+        try (InputStream stream = file.getInputStream()) {
+            budgetService.addTransactionsFromInputStream(stream);
+            return ResponseEntity.ok().build();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(e.toString());
+        }
     }
 }

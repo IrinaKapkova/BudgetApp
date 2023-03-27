@@ -1,6 +1,9 @@
 package me.test.budgetap.services;
 
 import me.test.budgetap.model.Transaction;
+
+import java.io.IOException;
+import java.io.InputStream;
 // тут все используемые сервисы, чтоб использовать полиморфизм
 
 public interface BudgetService {
@@ -29,4 +32,6 @@ public interface BudgetService {
     boolean deleteTransaction(long id);
 
     void deleteAllTransaction();
+
+    abstract void addTransactionsFromInputStream(InputStream inputStream) throws IOException;
 }

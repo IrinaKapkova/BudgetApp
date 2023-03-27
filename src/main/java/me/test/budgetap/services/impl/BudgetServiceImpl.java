@@ -3,12 +3,15 @@ package me.test.budgetap.services.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import me.test.budgetap.model.Category;
 import me.test.budgetap.model.Transaction;
 import me.test.budgetap.services.BudgetService;
 import me.test.budgetap.services.FilesService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.*;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.LinkedHashMap;
@@ -197,6 +200,7 @@ public class BudgetServiceImpl implements BudgetService {
         transactions = new TreeMap<>();
     }
 
+
     // добавляем два приватных метода чтения и записи в файл трансакций, их нельзя вызывать из контроллера
     // первый private void saveToFile()
     // используем мапер ObjectMapper из библиотеки jackson для работы с json ,
@@ -255,11 +259,24 @@ public class BudgetServiceImpl implements BudgetService {
         }
 
     }
+
     // данный метод инициализирует чтение из файла после запуска приложения тк есть анатация @PostConstruct (Почтовая конструкция)
     // то есть он запускается автоматически после запуска приложения в нем и вызываем метод readFromFile() чтоб
     // в текущую оперативную память прочитал данные из долгосрочной памяти (из сохраненного на компьюторе файла)
     @PostConstruct
-    private  void init(){
-readFromFile();
+    private void init() {
+        readFromFile();
+    }
+    @Override
+public void addTransactionsFromInputStream(InputStream inputStream) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+            String line;
+            while ((line=reader.readLine()) !=null) {
+                String[] array= StringUtils.split(line, '|');
+                Transaction transaction = new Transaction(Category.valueOf(array[0]), Integer.valueOf(array[1]), array[2]);
+            addTransaction(transaction);
+            }
+        }
     }
 }
+
